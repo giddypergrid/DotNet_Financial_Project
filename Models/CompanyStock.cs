@@ -18,7 +18,6 @@ namespace backend.Models
         public decimal LastDiv { get; set; }
         public string Industry { get; set; } = String.Empty;
         public long MarketCap { get; set; }
-        public List<int> CommentIds { get; set; } = new List<int>();
-        public List<Comment>? Comments { get; set; } = new List<Comment>();
+        public List<Comment> Comments { get; set; } = new List<Comment>();
     }
 }

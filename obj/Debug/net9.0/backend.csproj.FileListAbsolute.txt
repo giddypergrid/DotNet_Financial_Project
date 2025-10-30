@@ -165,3 +165,8 @@ C:\Users\PC\Desktop\ReactdotNet\backend\bin\Debug\net9.0\Swashbuckle.AspNetCore.
 C:\Users\PC\Desktop\ReactdotNet\backend\bin\Debug\net9.0\Swashbuckle.AspNetCore.SwaggerUI.dll
 C:\Users\PC\Desktop\ReactdotNet\backend\bin\Debug\net9.0\Mapster.dll
 C:\Users\PC\Desktop\ReactdotNet\backend\bin\Debug\net9.0\Mapster.Core.dll
+C:\Users\PC\Desktop\ReactdotNet\backend\obj\Debug\net9.0\backend.sourcelink.json
+C:\Users\PC\Desktop\ReactdotNet\backend\bin\Debug\net9.0\Microsoft.AspNetCore.JsonPatch.dll
+C:\Users\PC\Desktop\ReactdotNet\backend\bin\Debug\net9.0\Microsoft.AspNetCore.Mvc.NewtonsoftJson.dll
+C:\Users\PC\Desktop\ReactdotNet\backend\bin\Debug\net9.0\Newtonsoft.Json.dll
+C:\Users\PC\Desktop\ReactdotNet\backend\bin\Debug\net9.0\Newtonsoft.Json.Bson.dll

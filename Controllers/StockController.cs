@@ -3,10 +3,13 @@ using Microsoft.EntityFrameworkCore;
 using backend.Data;
 using backend.Dtos.CompanyStockDtoNamespace;
 using backend.Repository.Interface;
+using backend.Constants;
+using backend.Helpers.Objects;
+using backend.Dtos.General;
 
 namespace backend.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("[controller]")]
     [ApiController]
     public class StockController: ControllerBase
     {
@@ -16,11 +19,41 @@ namespace backend.Controllers
             _stockRepository = stockRepository;
         }
 
-        [HttpGet]
-        public async Task<IActionResult> GetAllStocks()
+        [HttpGet("search")]
+        public async Task<IActionResult> SearchStocks([FromQuery] queryStockObject queryStockObject)
         {
-            var stocks = await _stockRepository.GetAllStocks();
-            return Ok(stocks.Select(s => s.ToDto()));
+            var (stocks, totalCount) = await _stockRepository.SearchStocks(queryStockObject);
+            
+            bool hasMoreData = stocks.Count > (queryStockObject.PageSize ?? 10);
+            if (hasMoreData)
+            {
+                stocks.RemoveAt(stocks.Count - 1);
+            }
+            
+            string? nextCursorSymbol = null;
+            string? nextCursorCompanyName = null;
+            int? nextCursorId = null;
+            
+            if (hasMoreData && stocks.Count > 0)
+            {
+                var lastStock = stocks.Last();
+                nextCursorSymbol = lastStock.Symbol;
+                nextCursorCompanyName = lastStock.CompanyName;
+                nextCursorId = lastStock.Id;
+            }
+            
+            var paginatedResponse = new paginationDto<CompanyStockDto>
+            {
+                Data = stocks.Select(s => s.ToDto()).ToList(),
+                TotalCount = totalCount,
+                PageIndex = queryStockObject.PageIndex ?? 1,
+                PageSize = queryStockObject.PageSize ?? 10,
+                NextStringId = nextCursorSymbol,
+                NextIntId = nextCursorId,
+                HasMoreData = hasMoreData
+            };
+            
+            return Ok(paginatedResponse);
         }
 
         [HttpGet("{id}")]
@@ -37,14 +70,16 @@ namespace backend.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateStock(CreateCompanyStockDto createCompanyStockDto)
         {
-            var existingStock = await _stockRepository.GetStockBySymbol(createCompanyStockDto.Symbol);
-            if (existingStock != null)
-            {
-                return BadRequest("Stock with this symbol already exists.");
-            }
 
-            var companyStock = createCompanyStockDto.ToModel();
-            await _stockRepository.CreateStock(companyStock);
+            var (companyStock, statusCode) = await _stockRepository.CreateStock(createCompanyStockDto);
+            if (statusCode == StatusCodeConstants.COMMENT_EXIST_WHEN_CREATE)
+            {
+                return Conflict("Stock with this symbol already exists");
+            }
+            if (companyStock == null)
+            {
+                return BadRequest("Failed to create stock");
+            }
             return CreatedAtAction(nameof(GetStockById), new { id = companyStock.Id }, companyStock.ToDto());
         }
 

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 using backend.Dtos.CompanyStockDtoNamespace;
@@ -8,24 +9,35 @@ using Mapster;
 
 namespace backend.Dtos.CommentDtoNamespace
 {
-    public class CommentDto
+    public class CreateCommentDto
     {
-        public int Id { get; set; }
+        [Required(ErrorMessage = "Title is required")]
+        [StringLength(100, ErrorMessage = "Title cannot exceed 100 characters")]
         public string Title { get; set; } = String.Empty;
+        
+        [Required(ErrorMessage = "Content is required")]
+        [StringLength(500, ErrorMessage = "Content cannot exceed 500 characters")]
         public string Content { get; set; } = String.Empty;
-        public DateTime CreatedOn { get; set; } = DateTime.Now;
+        
+        [Required(ErrorMessage = "CompanyStockId is required")]
+        [Range(1, int.MaxValue, ErrorMessage = "CompanyStockId must be a positive number")]
         public int CompanyStockId { get; set; }
     }
+    public class CommentDto: CreateCommentDto
+    {
+        public DateTime CreatedOn { get; set; } = DateTime.Now;
+        public DateTime UpdatedOn { get; set; } = DateTime.Now;
+    }
+    
     public static class CommentDtoMapper
     {
-        public static CommentDto ToDto(this Comment comment, bool includeCompanyStock = true)
+        public static CommentDto ToDto(this Comment comment)
         {
            CommentDto commentDto =  comment.Adapt<CommentDto>();
            return commentDto;
         }
-        public static Comment ToModel(this CommentDto commentDto, bool includeCompanyStock = true)
-        {
-            Comment comment = commentDto.Adapt<Comment>();
+        public static Comment ToModel(this CreateCommentDto createCommentDto){
+            Comment comment = createCommentDto.Adapt<Comment>();
             return comment;
         }
     }
