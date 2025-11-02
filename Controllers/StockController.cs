@@ -4,7 +4,7 @@ using backend.Data;
 using backend.Dtos.CompanyStockDtoNamespace;
 using backend.Repository.Interface;
 using backend.Constants;
-using backend.Helpers.Objects;
+using backend.Helpers;
 using backend.Dtos.General;
 
 namespace backend.Controllers

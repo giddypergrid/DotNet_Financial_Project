@@ -1,7 +1,7 @@
 using backend.Models;
 using backend.Dtos.CompanyStockDtoNamespace;
 using backend.Dtos.CommentDtoNamespace;
-using backend.Helpers.Objects;
+using backend.Helpers;
     
 namespace backend.Repository.Interface
 {

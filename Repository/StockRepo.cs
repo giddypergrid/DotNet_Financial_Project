@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using backend.Data;
 using backend.Dtos.CompanyStockDtoNamespace;
 using backend.Constants;
-using backend.Helpers.Objects;
+using backend.Helpers;
 
 namespace backend.Repository
 {
@@ -26,44 +26,26 @@ namespace backend.Repository
             int pageIndex = queryStockObject.PageIndex ?? 1;
             int pageSize = queryStockObject.PageSize ?? 10;
             if (hasSymbol){
-                queryable = queryable.Where(s => s.Symbol.Contains(queryStockObject.Symbol));
-                if(queryStockObject.isDescending){
-                    queryable = queryable.OrderByDescending(s => s.Symbol);
-                }else{
-                    queryable = queryable.OrderBy(s => s.Symbol);
-                }
+                queryable = queryable.Where(s => s.Symbol.Contains(queryStockObject.Symbol!));
+                queryable = QueryableFunctions.QuerySortingByProperty(queryable, x => x.Symbol, queryStockObject.isDescending, true);
             }
             if (hasCompanyName){
-                queryable = queryable.Where(s => s.CompanyName.Contains(queryStockObject.CompanyName));
-                if(queryStockObject.isDescending){
-                    queryable = queryable.OrderByDescending(s => s.CompanyName);
-                }else{
-                    queryable = queryable.OrderBy(s => s.CompanyName);
-                }
+                queryable = queryable.Where(s => s.CompanyName.Contains(queryStockObject.CompanyName!));
+                queryable = QueryableFunctions.QuerySortingByProperty(queryable, x => x.CompanyName, queryStockObject.isDescending, true);
             }
             if(!hasSymbol && !hasCompanyName){
                 return (new List<CompanyStock>([]), 0);
             }
             int totalCount = await queryable.CountAsync();
             bool hasCursor = !string.IsNullOrEmpty(queryStockObject.LastStringId);
+
             if(hasCursor){
-                if(hasSymbol){
-                    if (queryStockObject.isDescending){
-                        queryable = queryable.Where(s => s.Symbol.CompareTo(queryStockObject.LastStringId) < 0);
-                    }else{
-                        queryable = queryable.Where(s => s.Symbol.CompareTo(queryStockObject.LastStringId) > 0);
-                    }
-                }
-                if(hasCompanyName){
-                    if (queryStockObject.isDescending){
-                        queryable = queryable.Where(s => s.CompanyName.CompareTo(queryStockObject.LastStringId) < 0);
-                    }else{
-                        queryable = queryable.Where(s => s.CompanyName.CompareTo(queryStockObject.LastStringId) > 0);
-                    }
-                }
+                queryable = QueryableFunctions.QueryFilterByProperty(queryable, nameof(CompanyStock.Symbol), queryStockObject.LastStringId, QueryableFunctions.CompareType.LessThan, true);
+                queryable = QueryableFunctions.QueryFilterByProperty(queryable, nameof(CompanyStock.CompanyName), queryStockObject.LastStringId, QueryableFunctions.CompareType.LessThan, true);
             }else{
                 queryable = queryable.Skip((pageIndex - 1) * pageSize);
             }
+
             var stocks = await queryable.Take(pageSize + 1).ToListAsync();
             return (stocks, totalCount);
         }
