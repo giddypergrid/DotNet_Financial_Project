@@ -11,11 +11,6 @@ namespace backend.Helpers
     {
         public static IQueryable<T> QuerySortingByProperty<T>(IQueryable<T> queryable, Expression<Func<T, object>> keySelector, bool isDescending, bool doSort=false)
         {
-            if (!doSort || keySelector == null)
-            {
-                EasyLogger.Instance.Log(nameof(QueryableFunctions), nameof(QuerySortingByProperty), $"doSort is false or keySelector is null");
-                return queryable;
-            }
             return isDescending
             ? queryable.OrderByDescending(keySelector)
             : queryable.OrderBy(keySelector);
