@@ -44,6 +44,9 @@ namespace backend.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<DateTime>("UpdatedOn")
+                        .HasColumnType("datetime2");
+
                     b.HasKey("Id");
 
                     b.HasIndex("CompanyStockId");
@@ -58,10 +61,6 @@ namespace backend.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.PrimitiveCollection<string>("CommentIds")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("CompanyName")
                         .IsRequired()
@@ -91,13 +90,11 @@ namespace backend.Migrations
 
             modelBuilder.Entity("backend.Models.Comment", b =>
                 {
-                    b.HasOne("backend.Models.CompanyStock", "CompanyStock")
+                    b.HasOne("backend.Models.CompanyStock", null)
                         .WithMany("Comments")
                         .HasForeignKey("CompanyStockId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("CompanyStock");
                 });
 
             modelBuilder.Entity("backend.Models.CompanyStock", b =>

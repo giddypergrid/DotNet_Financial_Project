@@ -10,8 +10,9 @@ namespace backend.Models
         public int Id { get; set; }
         public string Title { get; set; } = String.Empty;
         public string Content { get; set; } = String.Empty;
-        public DateTime CreatedOn { get; set; } = DateTime.Now;
+        public DateTime CreatedOn { get; set; } = DateTime.UtcNow;
+
+        public DateTime UpdatedOn { get; set; } = DateTime.UtcNow;
         public int CompanyStockId { get; set; }
-        public CompanyStock? CompanyStock { get; set; }
     }
 }

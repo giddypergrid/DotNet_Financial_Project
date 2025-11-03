@@ -12,6 +12,16 @@ namespace backend.Data
         public ApplicationDBContext(DbContextOptions dbContextOptions): base(dbContextOptions)
         {
         }
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<CompanyStock>().Navigation(c => c.Comments).AutoInclude();
+            
+            modelBuilder.Entity<CompanyStock>()
+                .HasIndex(s => s.Symbol);
+            
+            modelBuilder.Entity<CompanyStock>()
+                .HasIndex(s => s.CompanyName);
+        }
         public DbSet<CompanyStock> CompanyStocks { get; set; }
         public DbSet<Comment> Comments { get; set; }
     }

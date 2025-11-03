@@ -6,9 +6,13 @@ using backend.Repository;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddOpenApi();
-builder.Services.AddControllers();
+builder.Services.AddControllers().AddNewtonsoftJson(options =>
+{
+    options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
+});
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
 // Add DbContext
 builder.Services.AddDbContext<ApplicationDBContext>(options =>
 {
@@ -16,6 +20,7 @@ builder.Services.AddDbContext<ApplicationDBContext>(options =>
 });
 
 builder.Services.AddScoped<IStockRepository, StockRepo>();
+builder.Services.AddScoped<ICommentRepository, CommentRepo>();
 
 var app = builder.Build();
 
