@@ -6,6 +6,7 @@ using backend.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
+using backend.Service;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -28,7 +29,6 @@ builder.Services.AddIdentity<DefaultUser, IdentityRole>(options=>{
     options.Password.RequireUppercase = true;
     options.Password.RequireNonAlphanumeric = true;
     options.Password.RequiredLength = 8;
-    options.Password.RequiredUniqueChars = 5;
 }).AddEntityFrameworkStores<ApplicationDBContext>();
 
 builder.Services.AddAuthentication(options =>
@@ -51,6 +51,7 @@ builder.Services.AddAuthentication(options =>
 
 builder.Services.AddScoped<IStockRepository, StockRepo>();
 builder.Services.AddScoped<ICommentRepository, CommentRepo>();
+builder.Services.AddScoped<ITokenService, TokenService>();
 
 var app = builder.Build();
 

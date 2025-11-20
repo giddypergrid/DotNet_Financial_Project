@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using backend.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity;
 
 namespace backend.Data
 {
@@ -16,6 +17,12 @@ namespace backend.Data
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+            List<IdentityRole> roles = new List<IdentityRole>
+            {
+                new IdentityRole{Id = "Admin", Name = "Admin", NormalizedName = "ADMIN"},
+                new IdentityRole{Id = "User", Name = "User", NormalizedName = "USER"}
+            };
+            modelBuilder.Entity<IdentityRole>().HasData(roles);
             
             modelBuilder.Entity<CompanyStock>().Navigation(c => c.Comments).AutoInclude();
             
