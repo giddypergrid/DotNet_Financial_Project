@@ -7,6 +7,11 @@ using Microsoft.AspNetCore.Identity;
 using backend.Models;
 using backend.Dtos.User;
 using backend.Service;
+using backend.Extensions;
+using backend.Repository.Interface;
+using Microsoft.AspNetCore.Authorization;
+using backend.Dtos.CompanyStockDtoNamespace;
+
 namespace backend.Controllers
 {
     [Route("[controller]")]
@@ -16,11 +21,15 @@ namespace backend.Controllers
         private readonly UserManager<DefaultUser> _userManager;
         private readonly SignInManager<DefaultUser> _signInManager;
         private readonly ITokenService _tokenService;
-        public UserController(UserManager<DefaultUser> userManager, SignInManager<DefaultUser> signInManager, ITokenService tokenService)
+        private readonly IStockRepository _stockRepository;
+        private readonly IUserRepository _userRepository;
+        public UserController(UserManager<DefaultUser> userManager, SignInManager<DefaultUser> signInManager, ITokenService tokenService, IStockRepository stockRepository, IUserRepository userRepository)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _tokenService = tokenService;
+            _stockRepository = stockRepository;
+            _userRepository = userRepository;
         }
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] RegisterDto registerDto)
@@ -61,7 +70,7 @@ namespace backend.Controllers
                 return Ok(new LoginResponseDto{Email = user.Email, Role = userRoles.FirstOrDefault() ?? "User", Token = _tokenService.GenerateToken(user)});
             }
         }
-        
+
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteUser([FromRoute] string id)
         {
@@ -101,6 +110,56 @@ namespace backend.Controllers
             {
                 return BadRequest(e.Message);
             }
+        }
+
+        [HttpGet("getUserStocks")]
+        [Authorize]
+        public async Task<IActionResult> GetUserStocks()
+        {
+            var user = await _userRepository.isUserExist(User, _userManager);
+            if (user == null)
+            {
+                return NotFound("User not found");
+            }
+            return Ok((await _userRepository.GetUserStocks(user)).Select(stock=>stock.ToDtoNoComments()));
+        }
+
+        [HttpPost("addUserStocks")]
+        [Authorize]
+        public async Task<IActionResult> AddUserStocks([FromBody] List<string> symbols)
+        {
+            var user = await _userRepository.isUserExist(User, _userManager);
+            if (user == null)
+            {
+                return Unauthorized("User not found");
+            }
+            if (symbols.Count == 0)
+            {
+                return BadRequest("Symbols list is empty");
+            }
+            return Ok((await _userRepository
+                        .AddUserStock(symbols.Select(symbol=>symbol.Trim().ToUpper()).ToList(), user))
+                        .Select(stock=>stock.ToDtoNoComments()
+                    ));
+        }
+        [HttpDelete("deleteUserStocks")]
+        [Authorize]
+        public async Task<IActionResult> DeleteUserStock([FromBody] List<int> stockIds){
+            var user = await _userRepository.isUserExist(User, _userManager);
+            if (user == null)
+            {
+                return Unauthorized("User not found");
+            }
+            if (stockIds.Count == 0)
+            {
+                return BadRequest("Stock ids list is empty");
+            }
+            bool? result = await _userRepository.DeleteUserStock(stockIds, user);
+            if (result == null || !result.Value)
+            {
+                return BadRequest("Failed to delete stock");
+            }
+            return Ok("Stock deleted successfully");
         }
     }
 }

@@ -22,7 +22,8 @@ namespace backend.Service
         public string GenerateToken(DefaultUser user)
         {
             var claims = new List<Claim>{
-                new Claim(JwtRegisteredClaimNames.Email, user.Email)
+                new Claim(JwtRegisteredClaimNames.Email, user.Email),
+                new Claim(JwtRegisteredClaimNames.NameId, user.Id)
             };
             var credentials = new SigningCredentials(_key, SecurityAlgorithms.HmacSha512Signature);
             var tokenDescriptor = new SecurityTokenDescriptor{

@@ -41,6 +41,11 @@ namespace backend.Dtos.CompanyStockDtoNamespace
         public List<CommentDto> Comments { get; set; } = new List<CommentDto>();
     }
 
+    public class CompanyStockDtoNoComments : CreateCompanyStockDto
+    {
+        public int Id { get; set; }
+    }
+
     public static class CompanyStockDtoMapper
     {
         public static CompanyStockDto ToDto(this CompanyStock companyStock)
@@ -48,7 +53,10 @@ namespace backend.Dtos.CompanyStockDtoNamespace
             CompanyStockDto companyStockDto = companyStock.Adapt<CompanyStockDto>();
             return companyStockDto;
         }
-
+        public static CompanyStockDtoNoComments ToDtoNoComments(this CompanyStock companyStock){
+            CompanyStockDtoNoComments companyStockDtoNoComments = companyStock.Adapt<CompanyStockDtoNoComments>();
+            return companyStockDtoNoComments;
+        }
         public static CompanyStock ToModel(this CreateCompanyStockDto createDto)
         {
             CompanyStock companyStock = createDto.Adapt<CompanyStock>();

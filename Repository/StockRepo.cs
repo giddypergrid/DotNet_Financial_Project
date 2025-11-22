@@ -57,7 +57,9 @@ namespace backend.Repository
         }
         public async Task<CompanyStock> GetStockById(int id)
         {
-            var stock = await _dbContext.CompanyStocks.FindAsync(id);
+            var stock = await _dbContext.CompanyStocks
+                .Include(s => s.Comments)
+                .FirstOrDefaultAsync(s => s.Id == id);
             return stock;
         }
         public async Task<(CompanyStock?, int)> CreateStock(CreateCompanyStockDto createCompanyStockDto)
@@ -73,7 +75,12 @@ namespace backend.Repository
             var companyStock = createCompanyStockDto.ToModel();
             await _dbContext.CompanyStocks.AddAsync(companyStock);
             await _dbContext.SaveChangesAsync();
-            return (companyStock, StatusCodeConstants.SUCCESS);
+            
+            var createdStock = await _dbContext.CompanyStocks
+                .Include(s => s.Comments)
+                .FirstOrDefaultAsync(s => s.Id == companyStock.Id);
+            
+            return (createdStock, StatusCodeConstants.SUCCESS);
         }
         public async Task<CompanyStock> DeleteStock(int id)
         {
@@ -85,7 +92,9 @@ namespace backend.Repository
         }
         public async Task<CompanyStock> UpdateStock(int id, CreateCompanyStockDto updateCompanyStockDto)
         {
-            var existingStock = await _dbContext.CompanyStocks.FindAsync(id);
+            var existingStock = await _dbContext.CompanyStocks
+                .Include(s => s.Comments)
+                .FirstOrDefaultAsync(s => s.Id == id);
             if (existingStock == null) return null;
 
             existingStock.CompanyName = updateCompanyStockDto.CompanyName;

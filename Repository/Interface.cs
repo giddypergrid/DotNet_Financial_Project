@@ -2,7 +2,9 @@ using backend.Models;
 using backend.Dtos.CompanyStockDtoNamespace;
 using backend.Dtos.CommentDtoNamespace;
 using backend.Helpers;
-    
+using System.Security.Claims;
+using Microsoft.AspNetCore.Identity;
+
 namespace backend.Repository.Interface
 {
     public interface IStockRepository{
@@ -23,5 +25,11 @@ namespace backend.Repository.Interface
         Task<bool> isStockExist(int stockId);
         Task<bool> isCommentExist(int commentId);
 
+    }
+    public interface IUserRepository{
+        Task<DefaultUser?> isUserExist(ClaimsPrincipal user, UserManager<DefaultUser> userManager);
+        Task<List<CompanyStock>> GetUserStocks(DefaultUser user);
+        Task<List<CompanyStock>> AddUserStock(List<string> symbols, DefaultUser user);
+        Task<bool?> DeleteUserStock(List<int> stockIds, DefaultUser user);
     }
 }

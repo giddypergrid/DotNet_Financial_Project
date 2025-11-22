@@ -24,16 +24,31 @@ namespace backend.Data
             };
             modelBuilder.Entity<IdentityRole>().HasData(roles);
             
-            modelBuilder.Entity<CompanyStock>().Navigation(c => c.Comments).AutoInclude();
-            
             modelBuilder.Entity<CompanyStock>()
                 .HasIndex(s => s.Symbol);
             
             modelBuilder.Entity<CompanyStock>()
                 .HasIndex(s => s.CompanyName);
+            
+            // Configure many-to-many relationship between DefaultUser and CompanyStock via Portfolio
+            modelBuilder.Entity<Portfolio>()
+                .HasKey(p => new { p.DefaultUserId, p.CompanyStockId });
+            
+            modelBuilder.Entity<Portfolio>()
+                .HasOne(p => p.DefaultUser)
+                .WithMany(u => u.Portfolios)
+                .HasForeignKey(p => p.DefaultUserId)
+                .OnDelete(DeleteBehavior.Cascade);
+            
+            modelBuilder.Entity<Portfolio>()
+                .HasOne(p => p.CompanyStock)
+                .WithMany(s => s.Portfolios)
+                .HasForeignKey(p => p.CompanyStockId)
+                .OnDelete(DeleteBehavior.Cascade);
         }
         public DbSet<CompanyStock> CompanyStocks { get; set; }
         public DbSet<Comment> Comments { get; set; }
+        public DbSet<Portfolio> Portfolios { get; set; }
     }
 }
 

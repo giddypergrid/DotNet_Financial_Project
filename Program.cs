@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using backend.Service;
+using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,7 +17,34 @@ builder.Services.AddControllers().AddNewtonsoftJson(options =>
     options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
 });
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(options =>
+{
+    options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        Name = "Authorization",
+        Description = "Enter 'Bearer' followed by a space and your JWT token.\nExample: Bearer your_token_here",
+        In = ParameterLocation.Header,
+        Type = SecuritySchemeType.Http,
+        Scheme = "Bearer",
+        BearerFormat = "JWT"
+    });
+
+    options.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                },
+                In = ParameterLocation.Header
+            },
+            Array.Empty<string>()
+        }
+    });
+});
 
 // Add DbContext
 builder.Services.AddDbContext<ApplicationDBContext>(options =>
@@ -33,7 +61,8 @@ builder.Services.AddIdentity<DefaultUser, IdentityRole>(options=>{
 
 builder.Services.AddAuthentication(options =>
 {
-    options.DefaultSignOutScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
 }).AddJwtBearer(options =>
 {
     options.TokenValidationParameters = new TokenValidationParameters
@@ -52,6 +81,7 @@ builder.Services.AddAuthentication(options =>
 builder.Services.AddScoped<IStockRepository, StockRepo>();
 builder.Services.AddScoped<ICommentRepository, CommentRepo>();
 builder.Services.AddScoped<ITokenService, TokenService>();
+builder.Services.AddScoped<IUserRepository, UserRepo>();
 
 var app = builder.Build();
 
@@ -63,6 +93,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseAuthentication();
+app.UseAuthorization();
 
 var summaries = new[]
 {
