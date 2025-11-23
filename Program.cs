@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using backend.Service;
 using Microsoft.OpenApi.Models;
+using backend.Dtos;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -84,6 +85,8 @@ builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IUserRepository, UserRepo>();
 
 var app = builder.Build();
+
+MapsterIgnoreRule.register();
 
 if (app.Environment.IsDevelopment())
 {

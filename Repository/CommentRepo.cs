@@ -29,13 +29,16 @@ namespace backend.Repository
         {
             return await _dbContext.Comments.FindAsync(id);
         }
-        public async Task<(Comment?, int)> CreateComment(Comment comment)
+        public async Task<(Comment?, int)> CreateComment(Comment comment, DefaultUser user)
         {
             if (await isStockExist(comment.CompanyStockId) == false)
             {
                 return (null, StatusCodeConstants.STOCK_NOT_FOUND);
             }
-            
+            if (user.Id == null||user.Id.Length == 0){
+                return (comment, StatusCodeConstants.USER_NOT_FOUND);
+            }
+            comment.UserId = user.Id;
             await _dbContext.Comments.AddAsync(comment);
             await _dbContext.SaveChangesAsync();
             return (comment, StatusCodeConstants.SUCCESS);

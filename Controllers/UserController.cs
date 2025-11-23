@@ -116,7 +116,7 @@ namespace backend.Controllers
         [Authorize]
         public async Task<IActionResult> GetUserStocks()
         {
-            var user = await _userRepository.isUserExist(User, _userManager);
+            var user = await _userRepository.GetDefaultUser(User, _userManager);
             if (user == null)
             {
                 return NotFound("User not found");
@@ -128,7 +128,7 @@ namespace backend.Controllers
         [Authorize]
         public async Task<IActionResult> AddUserStocks([FromBody] List<string> symbols)
         {
-            var user = await _userRepository.isUserExist(User, _userManager);
+            var user = await _userRepository.GetDefaultUser(User, _userManager);
             if (user == null)
             {
                 return Unauthorized("User not found");
@@ -145,7 +145,7 @@ namespace backend.Controllers
         [HttpDelete("deleteUserStocks")]
         [Authorize]
         public async Task<IActionResult> DeleteUserStock([FromBody] List<int> stockIds){
-            var user = await _userRepository.isUserExist(User, _userManager);
+            var user = await _userRepository.GetDefaultUser(User, _userManager);
             if (user == null)
             {
                 return Unauthorized("User not found");

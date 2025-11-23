@@ -20,7 +20,7 @@ namespace backend.Repository
             _dbContext = dbContext;
         }
 
-        public async Task<DefaultUser?> isUserExist(ClaimsPrincipal user, UserManager<DefaultUser> userManager)
+        public async Task<DefaultUser?> GetDefaultUser(ClaimsPrincipal user, UserManager<DefaultUser> userManager)
         {
             string userId = user.getClaimUserId();
             if (userId == null){

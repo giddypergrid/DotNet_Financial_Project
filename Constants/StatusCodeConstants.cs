@@ -8,6 +8,7 @@ namespace backend.Constants
         public const int COMMENT_EXIST_WHEN_CREATE = 100001;
         public const int STOCK_NOT_FOUND = 100002;
         public const int COMMENT_NOT_FOUND = 100003;
+        public const int USER_NOT_FOUND = 100004;
     }
 
 }

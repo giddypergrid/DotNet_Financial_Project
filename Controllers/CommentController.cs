@@ -5,7 +5,10 @@ using System.Threading.Tasks;
 using backend.Constants;
 using backend.Dtos.CommentDtoNamespace;
 using backend.Repository.Interface;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Identity;
+using backend.Models;
 
 namespace backend.Controllers
 {   
@@ -14,12 +17,19 @@ namespace backend.Controllers
     public class CommentController: ControllerBase
     {
         private readonly ICommentRepository _commentRepository;
-        public CommentController(ICommentRepository commentRepository){
+        private readonly UserManager<DefaultUser> _userManager;
+        public CommentController(ICommentRepository commentRepository, UserManager<DefaultUser> userManager){
             _commentRepository = commentRepository;
+            _userManager = userManager;
         }
         [HttpPost]
+        [Authorize]
         public async Task<IActionResult> CreateComment(CreateCommentDto createCommentDto){
-            var (comment, statusCode) = await _commentRepository.CreateComment(createCommentDto.ToModel());
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null){
+                return Unauthorized("User not found");
+            }
+            var (comment, statusCode) = await _commentRepository.CreateComment(createCommentDto.ToModel(), user);
             if (statusCode == StatusCodeConstants.STOCK_NOT_FOUND){
                 return NotFound("Stock not found");
             }

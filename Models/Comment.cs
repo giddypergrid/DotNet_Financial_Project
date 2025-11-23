@@ -14,5 +14,7 @@ namespace backend.Models
 
         public DateTime UpdatedOn { get; set; } = DateTime.UtcNow;
         public int CompanyStockId { get; set; }
+        public string UserId { get; set; }
+        public DefaultUser User { get; set; }
     }
 }

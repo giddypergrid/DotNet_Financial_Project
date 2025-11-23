@@ -19,7 +19,7 @@ namespace backend.Repository.Interface
 
     public interface ICommentRepository{
         Task<Comment?> GetCommentById(int id);
-        Task<(Comment?, int)> CreateComment(Comment comment);
+        Task<(Comment?, int)> CreateComment(Comment comment, DefaultUser user);
         Task<(Comment?, int)> UpdateComment(int id, CreateCommentDto createCommentDto);
         Task<(Comment?, int)> DeleteComment(int id);
         Task<bool> isStockExist(int stockId);
@@ -27,7 +27,7 @@ namespace backend.Repository.Interface
 
     }
     public interface IUserRepository{
-        Task<DefaultUser?> isUserExist(ClaimsPrincipal user, UserManager<DefaultUser> userManager);
+        Task<DefaultUser?> GetDefaultUser(ClaimsPrincipal user, UserManager<DefaultUser> userManager);
         Task<List<CompanyStock>> GetUserStocks(DefaultUser user);
         Task<List<CompanyStock>> AddUserStock(List<string> symbols, DefaultUser user);
         Task<bool?> DeleteUserStock(List<int> stockIds, DefaultUser user);

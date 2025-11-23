@@ -30,7 +30,6 @@ namespace backend.Data
             modelBuilder.Entity<CompanyStock>()
                 .HasIndex(s => s.CompanyName);
             
-            // Configure many-to-many relationship between DefaultUser and CompanyStock via Portfolio
             modelBuilder.Entity<Portfolio>()
                 .HasKey(p => new { p.DefaultUserId, p.CompanyStockId });
             
@@ -44,6 +43,12 @@ namespace backend.Data
                 .HasOne(p => p.CompanyStock)
                 .WithMany(s => s.Portfolios)
                 .HasForeignKey(p => p.CompanyStockId)
+                .OnDelete(DeleteBehavior.Cascade);
+            
+            modelBuilder.Entity<Comment>()
+                .HasOne(c => c.User)
+                .WithMany()
+                .HasForeignKey(c => c.UserId)
                 .OnDelete(DeleteBehavior.Cascade);
         }
         public DbSet<CompanyStock> CompanyStocks { get; set; }

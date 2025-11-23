@@ -58,7 +58,7 @@ namespace backend.Repository
         public async Task<CompanyStock> GetStockById(int id)
         {
             var stock = await _dbContext.CompanyStocks
-                .Include(s => s.Comments)
+                .Include(s => s.Comments).ThenInclude(c=>c.User)
                 .FirstOrDefaultAsync(s => s.Id == id);
             return stock;
         }
@@ -77,7 +77,7 @@ namespace backend.Repository
             await _dbContext.SaveChangesAsync();
             
             var createdStock = await _dbContext.CompanyStocks
-                .Include(s => s.Comments)
+                .Include(s => s.Comments).ThenInclude(c=>c.User)
                 .FirstOrDefaultAsync(s => s.Id == companyStock.Id);
             
             return (createdStock, StatusCodeConstants.SUCCESS);
@@ -93,7 +93,7 @@ namespace backend.Repository
         public async Task<CompanyStock> UpdateStock(int id, CreateCompanyStockDto updateCompanyStockDto)
         {
             var existingStock = await _dbContext.CompanyStocks
-                .Include(s => s.Comments)
+                .Include(s => s.Comments).ThenInclude(c=>c.User)
                 .FirstOrDefaultAsync(s => s.Id == id);
             if (existingStock == null) return null;
 

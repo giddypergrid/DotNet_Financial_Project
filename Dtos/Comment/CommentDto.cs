@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 using backend.Dtos.CompanyStockDtoNamespace;
+using backend.Dtos.User;
 using backend.Models;
 using Mapster;  
 
@@ -25,6 +26,7 @@ namespace backend.Dtos.CommentDtoNamespace
     }
     public class CommentDto: CreateCommentDto
     {
+        public UserDisplayDto User { get; set; }
         public DateTime CreatedOn { get; set; } = DateTime.Now;
         public DateTime UpdatedOn { get; set; } = DateTime.Now;
     }
@@ -34,6 +36,7 @@ namespace backend.Dtos.CommentDtoNamespace
         public static CommentDto ToDto(this Comment comment)
         {
            CommentDto commentDto =  comment.Adapt<CommentDto>();
+           commentDto.User = comment.User.ToDto();
            return commentDto;
         }
         public static Comment ToModel(this CreateCommentDto createCommentDto){

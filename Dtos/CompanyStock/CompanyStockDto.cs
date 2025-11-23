@@ -51,6 +51,7 @@ namespace backend.Dtos.CompanyStockDtoNamespace
         public static CompanyStockDto ToDto(this CompanyStock companyStock)
         {
             CompanyStockDto companyStockDto = companyStock.Adapt<CompanyStockDto>();
+            companyStockDto.Comments = companyStock.Comments.Select(c => c.ToDto()).ToList();
             return companyStockDto;
         }
         public static CompanyStockDtoNoComments ToDtoNoComments(this CompanyStock companyStock){
